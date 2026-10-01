@@ -1,0 +1,95 @@
+/// Grão: 1 contato que desistiu de esperar antes de ser atendido. 6.498 linhas. Sem ID_Cliente e sem ID_Motivo de propósito: o sistema real não sabe quem era nem o que queria antes do primeiro contato humano. Só pode ser quebrado por data, canal e hora.
+table Fato_Abandonos
+	lineageTag: 7c4dd24c-e0fe-4b50-9677-e0092a82d288
+
+	column ID_Abandono
+		dataType: string
+		isHidden
+		lineageTag: 67b3e62b-53ca-491e-9801-369af7bcfb68
+		summarizeBy: none
+		sourceColumn: ID_Abandono
+
+		annotation SummarizationSetBy = Automatic
+
+	column Data_Hora
+		dataType: dateTime
+		formatString: dd/MM/yyyy HH:mm
+		lineageTag: 93f66d45-6ea0-499c-815d-e8f428221be8
+		summarizeBy: none
+		sourceColumn: Data_Hora
+
+		annotation SummarizationSetBy = Automatic
+
+	column ID_Canal
+		dataType: string
+		isHidden
+		lineageTag: 9f7d8013-f495-432a-b056-6f20e6bebcb0
+		summarizeBy: none
+		sourceColumn: ID_Canal
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Quanto o cliente esperou antes de desistir.
+	column Tempo_Espera_Seg
+		dataType: double
+		formatString: 0
+		lineageTag: 0f8db7b6-4fb7-4de8-ad65-3456414a297d
+		summarizeBy: none
+		sourceColumn: Tempo_Espera_Seg
+
+		annotation SummarizationSetBy = Automatic
+
+	column Data
+		dataType: dateTime
+		isHidden
+		formatString: dd/MM/yyyy
+		lineageTag: 9c782d92-d939-4354-998b-a6a33e81caad
+		summarizeBy: none
+		sourceColumn: Data
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	/// Não existe abandono às 04h e às 05h em todo o período — as duas células vazias no heatmap estão certas.
+	column Hora
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: ca7b894e-dab7-4117-b014-cd527098f4aa
+		summarizeBy: none
+		sourceColumn: Hora
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Fato_Abandonos = m
+		mode: import
+		source =
+				let
+				    Origem = Csv.Document(
+				        File.Contents(Caminho_Base & "\Fato_Abandonos.csv"),
+				        [Delimiter = ";", Columns = 4, Encoding = 65001, QuoteStyle = QuoteStyle.Csv]
+				    ),
+				    Cabecalho = Table.PromoteHeaders(Origem, [PromoteAllScalars = true]),
+				    SemBOM = Table.TransformColumnNames(Cabecalho, each Text.Replace(_, "#(feff)", "")),
+				    //
+				    // Data em ISO sob en-US; decimal com vírgula sob pt-BR.
+				    TipoData = Table.TransformColumnTypes(SemBOM, {{"Data_Hora", type datetime}}, "en-US"),
+				    //
+				    Tipos = Table.TransformColumnTypes(
+				        TipoData,
+				        {
+				            {"ID_Abandono", type text},
+				            {"ID_Canal", type text},
+				            {"Tempo_Espera_Seg", type number}
+				        },
+				        "pt-BR"
+				    ),
+				    //
+				    ChaveData = Table.AddColumn(Tipos, "Data", each Date.From([Data_Hora]), type date),
+				    ChaveHora = Table.AddColumn(ChaveData, "Hora", each Time.Hour([Data_Hora]), Int64.Type)
+				in
+				    ChaveHora
+
+	annotation PBI_ResultType = Table
+

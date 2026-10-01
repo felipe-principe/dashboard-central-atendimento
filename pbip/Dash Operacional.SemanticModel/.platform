@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "SemanticModel",
+    "displayName": "Dash Operacional"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "f86c2b66-4038-450c-a8ce-616075355d79"
+  }
+}

@@ -1,0 +1,399 @@
+/// Tabela sem dados. Existe só para hospedar as medidas DAX, mantendo-as fora
+/// das tabelas de dados e no topo do painel de campos.
+table _Medidas
+	lineageTag: a6205f02-4953-4446-9a47-199a37e3927d
+
+	/// Último dia com chamado na base (31/12/2025). Serve de "hoje" para as medidas de backlog. Usar TODAY() de verdade quebraria: a base é um ano fechado e fixo, então a idade dos casos pendentes cresceria sozinha a cada dia que passasse, sem nada ter acontecido na operação. Ancorar na última data com dados mantém a leitura estável.
+	measure 'Última Data com Dados' = CALCULATE(MAX(Fato_Chamados[Data]), REMOVEFILTERS())
+		formatString: dd/mm/yyyy
+		isHidden
+		displayFolder: 08 Auxiliares
+		lineageTag: 55bfc76e-9e32-4643-9984-04ce6aaa930c
+
+	/// Total de chamados atendidos no período filtrado. 141.431 na base inteira.
+	measure 'Volume de Chamados' = COUNTROWS(Fato_Chamados)
+		formatString: #,0
+		displayFolder: 01 Volume
+		lineageTag: 56d2f771-df78-4c77-a761-c77f5584cfc4
+
+	/// Clientes distintos que abriram ao menos um chamado: 35.754. NÃO é COUNTROWS(Dim_Cliente), que daria 45.000 — a base de assinantes, não quem procurou o atendimento.
+	measure 'Clientes Atendidos' = DISTINCTCOUNT(Fato_Chamados[ID_Cliente])
+		formatString: #,0
+		displayFolder: 01 Volume
+		lineageTag: 89342b4e-cc29-4202-a84c-2e04321009c9
+
+	/// Numerador do % SLA. Exposto como medida própria para poder aparecer sozinho numa tabela de apoio.
+	measure 'Chamados no SLA' = CALCULATE([Volume de Chamados], Fato_Chamados[SLA_Cumprido] = "Sim")
+		formatString: #,0
+		displayFolder: 02 SLA e Qualidade
+		lineageTag: 4fccd526-64b5-4e19-b5a6-8916d72957f9
+
+	/// Proporção de chamados cuja duração ficou dentro da meta do canal. 82,22% na base inteira; cai para 76,89% em junho/2025, o mês do incidente.
+	measure '% SLA Cumprido' = DIVIDE([Chamados no SLA], [Volume de Chamados])
+		formatString: 0.00%;-0.00%;0.00%
+		displayFolder: 02 SLA e Qualidade
+		lineageTag: 46be033b-0931-4528-91e8-775e68c82364
+
+	/// Tempo Médio de Atendimento, em minutos. 15,12 na base inteira; 17,53 em junho/2025.
+	measure TMA = AVERAGE(Fato_Chamados[Duracao_Min])
+		formatString: 0.00
+		displayFolder: 02 SLA e Qualidade
+		lineageTag: ba27f603-389e-4312-8ecb-037bd9cec8bb
+
+	/// Denominador do C-SAT e do IR: 43.018 chamados em que o cliente respondeu à pesquisa. Note que os dois KPIs de satisfação se medem sobre quem respondeu, não sobre todos os chamados.
+	measure 'Pesquisas Respondidas' = CALCULATE([Volume de Chamados], Fato_Chamados[Pesquisa_Respondida] = "Sim")
+		formatString: #,0
+		displayFolder: 02 SLA e Qualidade
+		lineageTag: 1b0f3225-3081-49a3-a590-db93d4696878
+
+	/// Pesquisas respondidas sobre o total de chamados: 30,42%. O plano reporta 30,9%; a diferença é de denominador (todos os chamados x só os encerrados).
+	measure 'Taxa de Resposta da Pesquisa' = DIVIDE([Pesquisas Respondidas], [Volume de Chamados])
+		formatString: 0.00%;-0.00%;0.00%
+		displayFolder: 02 SLA e Qualidade
+		lineageTag: 69845c7a-69e1-43b3-9bd6-a6cc2079a866
+
+	/// Proporção de pesquisas respondidas com nota 4 ou 5. Meta 95%; a base inteira dá exatamente 95,00%, e junho/2025 cai para 90,48%.
+	measure '% Positive Experience' =
+			DIVIDE(
+			    CALCULATE([Volume de Chamados], Fato_Chamados[Nota_Experiencia] >= 4),
+			    [Pesquisas Respondidas]
+			)
+		formatString: 0.00%;-0.00%;0.00%
+		displayFolder: 02 SLA e Qualidade
+		lineageTag: d59fd721-7b47-4726-88dd-dbb07dd17d9b
+
+	/// Proporção de pesquisas respondidas com "Sim" para "resolvemos o seu problema?". Meta 90%; a base dá 90,22%.
+	measure 'IR (Issue Resolution)' =
+			DIVIDE(
+			    CALCULATE([Volume de Chamados], Fato_Chamados[Problema_Resolvido] = "Sim"),
+			    [Pesquisas Respondidas]
+			)
+		formatString: 0.00%;-0.00%;0.00%
+		displayFolder: 02 SLA e Qualidade
+		lineageTag: 43c3a04d-dbc4-479d-acec-640e53e27846
+
+	measure 'Chamados Reabertos' = CALCULATE([Volume de Chamados], Fato_Chamados[Reaberto] = "Sim")
+		formatString: #,0
+		displayFolder: 02 SLA e Qualidade
+		lineageTag: 0c1592dd-11e1-45c6-9e3c-c8253851fc23
+
+	/// Retrabalho: 7,52% dos chamados voltam depois de encerrados.
+	measure 'Taxa de Reabertura' = DIVIDE([Chamados Reabertos], [Volume de Chamados])
+		formatString: 0.00%;-0.00%;0.00%
+		displayFolder: 02 SLA e Qualidade
+		lineageTag: 731e7591-8156-4766-b186-b183c451ff0e
+
+	/// Chamados atendidos dentro da meta de espera do canal (30s no chat, 45s no telefone).
+	measure 'Chamados no Nível de Serviço' = CALCULATE([Volume de Chamados], Fato_Chamados[Nivel_Servico_Cumprido] = "Sim")
+		formatString: #,0
+		displayFolder: 03 Nível de Serviço
+		lineageTag: 9787f2f0-475a-47de-bf0b-a8f33fadf14d
+
+	/// Meta 80%. A base dá 77,40% — abaixo da meta, e é justamente o que a página de WFM existe para explicar.
+	measure 'Nível de Serviço' = DIVIDE([Chamados no Nível de Serviço], [Volume de Chamados])
+		formatString: 0.00%;-0.00%;0.00%
+		displayFolder: 03 Nível de Serviço
+		lineageTag: 86c2dc3e-aa16-492a-ba2f-4a4ffa450753
+
+	/// Contatos que desistiram de esperar. CUIDADO: Fato_Abandonos não se relaciona com Cliente, Motivo nem Agente — quebrar esta medida por essas dimensões repete o mesmo total em todas as linhas.
+	measure Abandonos = COUNTROWS(Fato_Abandonos)
+		formatString: #,0
+		displayFolder: 03 Nível de Serviço
+		lineageTag: b1602d70-3f61-4f2f-94f2-46ab78c01084
+
+	/// Demanda total que chegou à fila: atendidos mais abandonados. 147.929 na base.
+	measure 'Contatos Ofertados' = [Volume de Chamados] + [Abandonos]
+		formatString: #,0
+		displayFolder: 03 Nível de Serviço
+		lineageTag: ca1b1960-129b-47dc-a1d0-58b2c1378935
+
+	/// Abandonos sobre o total ofertado. Meta < 5%; a base dá 4,39%. O denominador é o ofertado, não o atendido — senão a taxa seria subestimada.
+	measure 'Taxa de Abandono' = DIVIDE([Abandonos], [Contatos Ofertados])
+		formatString: 0.00%;-0.00%;0.00%
+		displayFolder: 03 Nível de Serviço
+		lineageTag: fbc39202-32a0-40e2-bf10-54bef85aee27
+
+	/// Tempo Médio de Espera de quem foi atendido, em segundos: 26,59.
+	measure 'TME (s)' = AVERAGE(Fato_Chamados[Tempo_Espera_Seg])
+		formatString: 0.00
+		displayFolder: 03 Nível de Serviço
+		lineageTag: 12cd7c02-d2bd-4e9d-be86-ca5d5a8ae9a4
+
+	/// Quanto quem desistiu esperou antes de abandonar: 114,13 segundos, mais de 4x o tempo de quem foi atendido.
+	measure 'Espera Média até Desistir (s)' = AVERAGE(Fato_Abandonos[Tempo_Espera_Seg])
+		formatString: 0.00
+		displayFolder: 03 Nível de Serviço
+		lineageTag: 1e3ffca0-aaee-4efb-bafa-ba489ce19783
+
+	/// Denominador do ABS: 26.052 dias agente-escalado. Folga e férias não viram linha na Fato_Escala, o que deixa este denominador limpo.
+	measure 'Dias Escalados' = COUNTROWS(Fato_Escala)
+		formatString: #,0
+		displayFolder: 04 WFM
+		lineageTag: d415a9fd-2e9a-43e3-9270-9907bff9ede8
+
+	measure Faltas = CALCULATE([Dias Escalados], Fato_Escala[Falta] = "Sim")
+		formatString: #,0
+		displayFolder: 04 WFM
+		lineageTag: c2a182c8-0e1f-42a1-9562-7d7ca2d08cce
+
+	/// Meta < 4%. A base dá 3,52%, mas junho/2025 estoura para 5,81% — é a causa da queda de serviço naquele mês.
+	measure 'ABS (Absenteísmo)' = DIVIDE([Faltas], [Dias Escalados])
+		formatString: 0.00%;-0.00%;0.00%
+		displayFolder: 04 WFM
+		lineageTag: 8975d9b7-e5c7-40bd-9191-62fde7dbfbb4
+
+	measure 'Minutos Aderentes' = SUM(Fato_Escala[Minutos_Aderentes])
+		formatString: #,0
+		displayFolder: 04 WFM
+		lineageTag: 7f7cbe91-1f60-4548-a83d-a864150bb664
+
+	measure 'Minutos Base Aderência' = SUM(Fato_Escala[Minutos_Base_Aderencia])
+		formatString: #,0
+		displayFolder: 04 WFM
+		lineageTag: bb5719fd-d05e-42f8-84e2-8ae8e8a6f9be
+
+	/// Meta 85%. Soma de minutos aderentes sobre soma da base, NUNCA média de percentuais diários — isso daria o mesmo peso a um dia com 90 escalados e a um com 12. A base dá 87,06%; março cai para 84,32%.
+	measure 'Aderência à Escala' = DIVIDE([Minutos Aderentes], [Minutos Base Aderência])
+		formatString: 0.00%;-0.00%;0.00%
+		displayFolder: 04 WFM
+		lineageTag: 2d2721d6-e057-4168-96ac-df7b68811e79
+
+	/// Casos que ainda precisam de continuidade: Escalonado ou Aguardando Retorno. 1.310 no fim do período.
+	measure 'Casos Pendentes' = CALCULATE([Volume de Chamados], Fato_Chamados[Status_Caso] <> "Encerrado")
+		formatString: #,0
+		displayFolder: 05 Backlog
+		lineageTag: 1fcd0ae4-be3d-46cf-9501-7985d08f8429
+
+	/// Dias desde a abertura dos casos não encerrados: 12,2. A referência é a última data com dados, não TODAY() — ver a medida auxiliar para o motivo.
+	measure 'Idade Média dos Casos Pendentes' =
+			VAR Ref = [Última Data com Dados]
+			RETURN
+			    AVERAGEX(
+			        FILTER(Fato_Chamados, Fato_Chamados[Status_Caso] <> "Encerrado"),
+			        DATEDIFF(Fato_Chamados[Data], Ref, DAY)
+			    )
+		formatString: 0.0
+		displayFolder: 05 Backlog
+		lineageTag: 298b0960-d95b-4ca7-9238-771670f8632d
+
+	/// Backlog crítico: 141 casos. É o alerta de cor da página de Backlog e Filas.
+	measure 'Casos Pendentes há mais de 30 dias' =
+			VAR Ref = [Última Data com Dados]
+			RETURN
+			    COUNTROWS(
+			        FILTER(
+			            Fato_Chamados,
+			            Fato_Chamados[Status_Caso] <> "Encerrado"
+			                && DATEDIFF(Fato_Chamados[Data], Ref, DAY) > 30
+			        )
+			    )
+		formatString: #,0
+		displayFolder: 05 Backlog
+		lineageTag: 4c2627e8-507c-46af-bcbb-777ae013600c
+
+	/// DATEADD exige que Dim_Data esteja marcada como tabela de data — e está.
+	measure 'Volume Mês Anterior' = CALCULATE([Volume de Chamados], DATEADD(Dim_Data[Data], -1, MONTH))
+		formatString: #,0
+		displayFolder: 06 Comparação Temporal
+		lineageTag: d5ee5cf7-8c0c-4bc7-9b6b-f00f4a301737
+
+	/// Variação percentual. Em junho/2025 dá +35,6% contra maio: o salto do incidente.
+	measure 'Var. Volume vs Mês Anterior' = DIVIDE([Volume de Chamados] - [Volume Mês Anterior], [Volume Mês Anterior])
+		formatString: 0.0%;-0.0%;0.0%
+		displayFolder: 06 Comparação Temporal
+		lineageTag: 105ce55c-5e98-44ba-bbb3-8a92ee7197e9
+
+	measure '% SLA Mês Anterior' = CALCULATE([% SLA Cumprido], DATEADD(Dim_Data[Data], -1, MONTH))
+		formatString: 0.00%;-0.00%;0.00%
+		displayFolder: 06 Comparação Temporal
+		lineageTag: 24c5af71-17ed-4086-838f-36659b9cd3f6
+
+	/// Diferença em pontos percentuais, não variação relativa: para um indicador que já é percentual, a subtração é o que se lê num cartão de KPI.
+	measure 'Var. SLA vs Mês Anterior (p.p.)' = IF(NOT ISBLANK([% SLA Mês Anterior]), [% SLA Cumprido] - [% SLA Mês Anterior])
+		formatString: 0.0%;-0.0%;0.0%
+		displayFolder: 06 Comparação Temporal
+		lineageTag: e4960b43-b1b3-4cad-9496-61fa5883f6bd
+
+	measure 'TMA Mês Anterior' = CALCULATE([TMA], DATEADD(Dim_Data[Data], -1, MONTH))
+		formatString: 0.00
+		displayFolder: 06 Comparação Temporal
+		lineageTag: 39ab4e06-9bd7-468b-98e7-2c00d3ecb29a
+
+	measure 'Var. TMA vs Mês Anterior' = IF(NOT ISBLANK([TMA Mês Anterior]), [TMA] - [TMA Mês Anterior])
+		formatString: 0.00
+		displayFolder: 06 Comparação Temporal
+		lineageTag: 7187b241-e926-422d-bbbd-68e552947138
+
+	measure '% Positive Experience Mês Anterior' = CALCULATE([% Positive Experience], DATEADD(Dim_Data[Data], -1, MONTH))
+		formatString: 0.00%;-0.00%;0.00%
+		displayFolder: 06 Comparação Temporal
+		lineageTag: 91ccb581-4aa0-4ed9-940c-88a856fcf751
+
+	measure 'Var. Positive Experience vs Mês Anterior (p.p.)' = IF(NOT ISBLANK([% Positive Experience Mês Anterior]), [% Positive Experience] - [% Positive Experience Mês Anterior])
+		formatString: 0.0%;-0.0%;0.0%
+		displayFolder: 06 Comparação Temporal
+		lineageTag: 46e2f3c7-78f8-406d-aeaf-d004d0743414
+
+	/// Vem da Dim_Canal, não fixada no código: os dois canais têm metas de espera diferentes (30s no chat, 45s no telefone) mas o mesmo alvo de 80%. Dividido por 100 porque a coluna guarda 80, não 0,80.
+	measure 'Meta Nível de Serviço' = DIVIDE(AVERAGE(Dim_Canal[Meta_Nivel_Servico_Pct]), 100)
+		formatString: 0.00%;-0.00%;0.00%
+		displayFolder: 07 Metas
+		lineageTag: 9e6a61a9-1344-4d40-9695-32e8091484f8
+
+	measure 'Meta % Positive Experience' = 0.95
+		formatString: 0.00%;-0.00%;0.00%
+		displayFolder: 07 Metas
+		lineageTag: 91812754-c1e3-43dc-9a28-808b0e608b09
+
+	measure 'Meta IR' = 0.90
+		formatString: 0.00%;-0.00%;0.00%
+		displayFolder: 07 Metas
+		lineageTag: ecc18fb7-cb50-42bd-9518-8372b0e907d7
+
+	measure 'Meta Taxa de Abandono' = 0.05
+		formatString: 0.00%;-0.00%;0.00%
+		displayFolder: 07 Metas
+		lineageTag: 1343fc00-3464-4d6e-a5c2-cdf0b00e3dcf
+
+	measure 'Meta ABS' = 0.04
+		formatString: 0.00%;-0.00%;0.00%
+		displayFolder: 07 Metas
+		lineageTag: 53781c9e-f88a-4386-a0c9-d22d136bfca7
+
+	measure 'Meta Aderência à Escala' = 0.85
+		formatString: 0.00%;-0.00%;0.00%
+		displayFolder: 07 Metas
+		lineageTag: b13d5b88-4f55-4a77-a549-eb55d7777a3c
+
+	/// Complemento do Nível de Serviço até 100%. Só existe para formar a segunda fatia do anel de progresso — um donut de [valor, 1-valor] é como se desenha anel de progresso no Power BI nativo.
+	measure 'Anel — Resto Nível de Serviço' = 1 - [Nível de Serviço]
+		formatString: 0.00%;-0.00%;0.00%
+		isHidden
+		displayFolder: 08 Auxiliares
+		lineageTag: abcdef01-2345-6789-abcd-700000000000
+
+	/// Complemento da Aderência à Escala até 100%, para a segunda fatia do anel.
+	measure 'Anel — Resto Aderência' = 1 - [Aderência à Escala]
+		formatString: 0.00%;-0.00%;0.00%
+		isHidden
+		displayFolder: 08 Auxiliares
+		lineageTag: abcdef01-2345-6789-abcd-700000000001
+
+	/// Fatia auxiliar do anel de % SLA. Existe só para fechar o círculo.
+	measure 'Anel — Resto % SLA Cumprido' = 1 - [% SLA Cumprido]
+		formatString: 0.00%;-0.00%;0.00%
+		isHidden
+		displayFolder: 08 Auxiliares
+		lineageTag: bcdef012-3456-789a-bcde-810000000000
+
+	/// Fatia auxiliar do anel de Positive Experience.
+	measure 'Anel — Resto % Positive Experience' = 1 - [% Positive Experience]
+		formatString: 0.00%;-0.00%;0.00%
+		isHidden
+		displayFolder: 08 Auxiliares
+		lineageTag: bcdef012-3456-789a-bcde-810000000001
+
+	/// Fatia auxiliar do anel de IR.
+	measure 'Anel — Resto IR' = 1 - [IR (Issue Resolution)]
+		formatString: 0.00%;-0.00%;0.00%
+		isHidden
+		displayFolder: 08 Auxiliares
+		lineageTag: bcdef012-3456-789a-bcde-810000000002
+
+	/// IR do mês anterior, para a variação exibida dentro do anel.
+	measure 'IR Mês Anterior' = CALCULATE([IR (Issue Resolution)], DATEADD(Dim_Data[Data], -1, MONTH))
+		formatString: 0.00%;-0.00%;0.00%
+		displayFolder: 06 Comparação Temporal
+		lineageTag: bcdef012-3456-789a-bcde-810000000003
+
+	/// Diferença em pontos percentuais. Aparece como número pequeno sob o anel de IR, do mesmo jeito que o dashboard de treinamento mostra o desvio sob o KPI.
+	measure 'Var. IR vs Mês Anterior (p.p.)' = IF(NOT ISBLANK([IR Mês Anterior]), [IR (Issue Resolution)] - [IR Mês Anterior])
+		formatString: 0.0%;-0.0%;0.0%
+		displayFolder: 06 Comparação Temporal
+		lineageTag: bcdef012-3456-789a-bcde-810000000004
+
+	/// Volume só do canal Chat. Existe para o gráfico de tendência por canal da página 1, onde as três séries (total,
+	/// chat, telefone) são áreas sobrepostas.
+	measure 'Volume Chat' = CALCULATE([Volume de Chamados], Dim_Canal[Nome_Canal] = "Chat")
+		formatString: #,0
+		displayFolder: 01 Volume
+		lineageTag: a1000000-0000-4000-8000-000000000001
+
+	/// Volume só do canal Telefone. Par do [Volume Chat] no gráfico de tendência por canal.
+	measure 'Volume Telefone' = CALCULATE([Volume de Chamados], Dim_Canal[Nome_Canal] = "Telefone")
+		formatString: #,0
+		displayFolder: 01 Volume
+		lineageTag: a1000000-0000-4000-8000-000000000002
+
+	/// Meta de atingimento do SLA. NÃO vem da base: a Dim_Canal traz a meta de TEMPO por canal (Meta_SLA_Min), que é
+	/// o que decide se cada chamado cumpriu o SLA — mas o percentual de chamados que precisa cumprir é decisão de
+	/// operação, e aqui está fixado em 85%.
+	measure 'Meta % SLA Cumprido' = 0.85
+		formatString: 0.00%;-0.00%;0.00%
+		displayFolder: 07 Metas
+		lineageTag: a1000000-0000-4000-8000-000000000003
+
+	/// Distância até a meta, em pontos percentuais. Aparece dentro do anel de SLA, em azul quando está na meta e em
+	/// vermelho quando está abaixo.
+	measure 'Desvio SLA vs Meta (p.p.)' = ([% SLA Cumprido] - [Meta % SLA Cumprido]) * 100
+		formatString: +0.0" p.p.";-0.0" p.p.";0.0" p.p."
+		displayFolder: 09 Desvio vs Meta
+		lineageTag: a1000000-0000-4000-8000-000000000010
+
+	/// Distância até os 95% de Positive Experience, em pontos percentuais.
+	measure 'Desvio Positive Experience vs Meta (p.p.)' = ([% Positive Experience] - [Meta % Positive Experience]) * 100
+		formatString: +0.0" p.p.";-0.0" p.p.";0.0" p.p."
+		displayFolder: 09 Desvio vs Meta
+		lineageTag: a1000000-0000-4000-8000-000000000011
+
+	/// Distância até os 90% de IR, em pontos percentuais.
+	measure 'Desvio IR vs Meta (p.p.)' = ([IR (Issue Resolution)] - [Meta IR]) * 100
+		formatString: +0.0" p.p.";-0.0" p.p.";0.0" p.p."
+		displayFolder: 09 Desvio vs Meta
+		lineageTag: a1000000-0000-4000-8000-000000000012
+
+	/// Distância até a meta de Nível de Serviço, que vem da Dim_Canal e por isso acompanha o filtro de canal.
+	measure 'Desvio Nível de Serviço vs Meta (p.p.)' = ([Nível de Serviço] - [Meta Nível de Serviço]) * 100
+		formatString: +0.0" p.p.";-0.0" p.p.";0.0" p.p."
+		displayFolder: 09 Desvio vs Meta
+		lineageTag: a1000000-0000-4000-8000-000000000013
+
+	/// Distância até os 85% de aderência, em pontos percentuais.
+	measure 'Desvio Aderência vs Meta (p.p.)' = ([Aderência à Escala] - [Meta Aderência à Escala]) * 100
+		formatString: +0.0" p.p.";-0.0" p.p.";0.0" p.p."
+		displayFolder: 09 Desvio vs Meta
+		lineageTag: a1000000-0000-4000-8000-000000000014
+
+	/// INVERTIDA de propósito: em abandono, menor é melhor, então a conta é meta menos realizado. Assim o sinal
+	/// positivo continua querendo dizer "está bom" nos oito indicadores, e a mesma regra de cor azul/vermelho serve
+	/// para todos sem exceção.
+	measure 'Desvio Abandono vs Meta (p.p.)' = ([Meta Taxa de Abandono] - [Taxa de Abandono]) * 100
+		formatString: +0.0" p.p.";-0.0" p.p.";0.0" p.p."
+		displayFolder: 09 Desvio vs Meta
+		lineageTag: a1000000-0000-4000-8000-000000000015
+
+	/// INVERTIDA, como a de abandono: em absenteísmo menor é melhor, então positivo significa abaixo da meta.
+	measure 'Desvio ABS vs Meta (p.p.)' = ([Meta ABS] - [ABS (Absenteísmo)]) * 100
+		formatString: +0.0" p.p.";-0.0" p.p.";0.0" p.p."
+		displayFolder: 09 Desvio vs Meta
+		lineageTag: a1000000-0000-4000-8000-000000000016
+
+	column Placeholder
+		dataType: string
+		isHidden
+		lineageTag: 01f40544-eaa2-4941-ad40-7cad48bb5c7f
+		summarizeBy: none
+		sourceColumn: Placeholder
+
+		annotation SummarizationSetBy = Automatic
+
+	partition _Medidas = m
+		mode: import
+		source =
+				let
+				    Fonte = #table(type table [Placeholder = text], {})
+				in
+				    Fonte
+
+	annotation PBI_ResultType = Table
+

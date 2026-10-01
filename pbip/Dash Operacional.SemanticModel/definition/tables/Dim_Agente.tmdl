@@ -1,0 +1,131 @@
+/// 90 agentes em 9 equipes de 10, uma por supervisor, distribuídos igualmente entre os turnos Manhã, Tarde e Noite.
+table Dim_Agente
+	lineageTag: ca0bb1fe-a7d1-43d3-ab84-c9defae60508
+
+	/// Chave. Relaciona-se com Fato_Chamados e Fato_Escala.
+	column ID_Agente
+		dataType: string
+		isHidden
+		lineageTag: 8b77e836-2b57-42d0-af8c-ac26b8041a16
+		summarizeBy: none
+		sourceColumn: ID_Agente
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Login do agente. Mantido por realismo; não é usado em nenhum visual.
+	column Usuario
+		dataType: string
+		isHidden
+		lineageTag: a6dd6c44-1695-46b3-b2b6-a33f9d8452fa
+		summarizeBy: none
+		sourceColumn: Usuario
+
+		annotation SummarizationSetBy = Automatic
+
+	column Nome_Agente
+		dataType: string
+		lineageTag: 45ca61bd-7205-483d-818a-70a4c05b6f7a
+		summarizeBy: none
+		sourceColumn: Nome_Agente
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Oculta porque o nome já aparece dentro de Equipe. Reexiba se precisar do nome puro.
+	column Supervisor
+		dataType: string
+		isHidden
+		lineageTag: 6cd1e440-95d1-4a6c-b4d6-0c8ab2cdeab8
+		summarizeBy: none
+		sourceColumn: Supervisor
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Turno em que o agente está ESCALADO. Não confundir com Dim_Hora[Turno_Horario], que é a faixa em que uma hora cai.
+	column Turno
+		dataType: string
+		lineageTag: 380a46bd-6c28-4437-ba67-fd254a4116a8
+		summarizeBy: none
+		sourceColumn: Turno
+		sortByColumn: Ordem_Turno
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Ordena Turno como Manhã > Tarde > Noite em vez de alfabeticamente.
+	column Ordem_Turno
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 939c4c92-5c27-4b48-8066-041ae577b924
+		summarizeBy: none
+		sourceColumn: Ordem_Turno
+
+		annotation SummarizationSetBy = Automatic
+
+	column Data_Contratacao
+		dataType: dateTime
+		formatString: dd/MM/yyyy
+		lineageTag: 67518a12-5aeb-4bd5-bea4-aba3d0cdd72f
+		summarizeBy: none
+		sourceColumn: Data_Contratacao
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	/// Rótulo "Equipe <supervisor>", mais legível num eixo de gráfico do que o nome solto.
+	column Equipe
+		dataType: string
+		lineageTag: 8ad23621-35fe-4b65-ba13-27afad4b24ee
+		summarizeBy: none
+		sourceColumn: Equipe
+
+		annotation SummarizationSetBy = Automatic
+
+	hierarchy Estrutura
+		lineageTag: 197074dc-54c7-4a6f-bd3f-1ff80242bc78
+
+		level Equipe
+			lineageTag: fb73610d-5c65-4f2e-8fa4-a12535c625c6
+			column: Equipe
+
+		level Nome_Agente
+			lineageTag: 16b132e8-91c9-43bd-8e50-c1e2c4d75c85
+			column: Nome_Agente
+
+	partition Dim_Agente = m
+		mode: import
+		source =
+				let
+				    Origem = Csv.Document(
+				        File.Contents(Caminho_Base & "\Dim_Agente.csv"),
+				        [Delimiter = ";", Columns = 6, Encoding = 65001, QuoteStyle = QuoteStyle.Csv]
+				    ),
+				    Cabecalho = Table.PromoteHeaders(Origem, [PromoteAllScalars = true]),
+				    SemBOM = Table.TransformColumnNames(Cabecalho, each Text.Replace(_, "#(feff)", "")),
+				    //
+				    // Data em ISO — convertida sob en-US, onde yyyy-MM-dd é inequívoco
+				    TipoData = Table.TransformColumnTypes(SemBOM, {{"Data_Contratacao", type date}}, "en-US"),
+				    //
+				    Tipos = Table.TransformColumnTypes(
+				        TipoData,
+				        {
+				            {"ID_Agente", type text},
+				            {"Usuario", type text},
+				            {"Nome_Agente", type text},
+				            {"Supervisor", type text},
+				            {"Turno", type text}
+				        },
+				        "pt-BR"
+				    ),
+				    Equipe = Table.AddColumn(Tipos, "Equipe", each "Equipe " & [Supervisor], type text),
+				    OrdemTurno = Table.AddColumn(
+				        Equipe,
+				        "Ordem_Turno",
+				        each if [Turno] = "Manha" then 1 else if [Turno] = "Tarde" then 2 else 3,
+				        Int64.Type
+				    )
+				in
+				    OrdemTurno
+
+	annotation PBI_ResultType = Table
+

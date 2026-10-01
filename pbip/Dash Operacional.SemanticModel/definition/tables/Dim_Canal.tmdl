@@ -1,0 +1,88 @@
+/// Canais de atendimento e suas metas. Guardar a meta na dimensão, em vez de fixá-la dentro da medida, permite uma única medida de "atingiu a meta?" servir aos dois canais, que têm metas diferentes.
+table Dim_Canal
+	lineageTag: ed89d5f1-d898-4e1b-9b07-323b900eb88a
+
+	/// Chave. Relaciona-se com Fato_Chamados e Fato_Abandonos.
+	column ID_Canal
+		dataType: string
+		isHidden
+		lineageTag: 526462c8-0c45-4728-a36a-73376d0d1c4d
+		summarizeBy: none
+		sourceColumn: ID_Canal
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Chat (69% do volume) ou Telefone (31%).
+	column Nome_Canal
+		dataType: string
+		lineageTag: 71132fc5-342b-4205-be4b-4edf4d32dbc0
+		summarizeBy: none
+		sourceColumn: Nome_Canal
+
+		annotation SummarizationSetBy = Automatic
+
+	column Tipo_Canal
+		dataType: string
+		lineageTag: 21c64cf2-677d-41e9-ac74-abea56863f24
+		summarizeBy: none
+		sourceColumn: Tipo_Canal
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Meta de duração do atendimento: 25 min no chat, 18 min no telefone.
+	column Meta_SLA_Min
+		dataType: int64
+		formatString: 0
+		lineageTag: a56fa1cb-890a-43c7-98f5-1d06de3e8399
+		summarizeBy: none
+		sourceColumn: Meta_SLA_Min
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Meta de espera: 30s no chat, 45s no telefone.
+	column Meta_Nivel_Servico_Seg
+		dataType: int64
+		formatString: 0
+		lineageTag: eb580a2c-f6fc-43be-9616-5d348eb66871
+		summarizeBy: none
+		sourceColumn: Meta_Nivel_Servico_Seg
+
+		annotation SummarizationSetBy = Automatic
+
+	/// ATENÇÃO: gravada como 80, não como 0,80. Divida por 100 ao comparar com a medida de Nível de Serviço, senão a linha de meta aparece em 8.000%.
+	column Meta_Nivel_Servico_Pct
+		dataType: int64
+		formatString: 0
+		lineageTag: 01e58698-9870-406b-ad61-94d42cf96094
+		summarizeBy: none
+		sourceColumn: Meta_Nivel_Servico_Pct
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Dim_Canal = m
+		mode: import
+		source =
+				let
+				    Origem = Csv.Document(
+				        File.Contents(Caminho_Base & "\Dim_Canal.csv"),
+				        [Delimiter = ";", Columns = 6, Encoding = 65001, QuoteStyle = QuoteStyle.Csv]
+				    ),
+				    Cabecalho = Table.PromoteHeaders(Origem, [PromoteAllScalars = true]),
+				    SemBOM = Table.TransformColumnNames(Cabecalho, each Text.Replace(_, "#(feff)", "")),
+				    Tipos = Table.TransformColumnTypes(
+				        SemBOM,
+				        {
+				            {"ID_Canal", type text},
+				            {"Nome_Canal", type text},
+				            {"Tipo_Canal", type text},
+				            {"Meta_SLA_Min", Int64.Type},
+				            {"Meta_Nivel_Servico_Seg", Int64.Type},
+				            {"Meta_Nivel_Servico_Pct", Int64.Type}
+				        },
+				        "pt-BR"
+				    )
+				in
+				    Tipos
+
+	annotation PBI_ResultType = Table
+

@@ -1,0 +1,77 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
+  "name": "9e0b38191d10b268d93c",
+  "position": {
+    "x": 101.08442004118051,
+    "y": 7.0281400137268362,
+    "z": 26000,
+    "height": 57.9821551132464,
+    "width": 819.65682910089231,
+    "tabOrder": 26000
+  },
+  "visual": {
+    "visualType": "textbox",
+    "objects": {
+      "general": [
+        {
+          "properties": {
+            "paragraphs": [
+              {
+                "textRuns": [
+                  {
+                    "value": "EXPERIÊNCIA  •  O QUE O CLIENTE RESPONDEU NA PESQUISA",
+                    "textStyle": {
+                      "fontWeight": "bold",
+                      "fontSize": "7.5pt",
+                      "color": "#2a9ac9"
+                    }
+                  }
+                ]
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": "CSAT e SLA",
+                    "textStyle": {
+                      "fontSize": "21pt",
+                      "color": "#e8ecf4"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "visualContainerObjects": {
+      "background": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "border": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

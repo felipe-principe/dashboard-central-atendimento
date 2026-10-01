@@ -1,0 +1,117 @@
+/// Grão: 1 agente por dia escalado. 26.052 linhas. Folga e férias não viram linha, o que deixa "dias escalados" como denominador limpo do ABS. ABS e aderência são gravados como contagem e minutos, nunca como percentual: média de percentuais diários daria o mesmo peso a dias com quantidades diferentes de gente escalada.
+table Fato_Escala
+	lineageTag: ea280764-5ed6-49a1-96cf-4670bf586c31
+
+	column ID_Escala
+		dataType: string
+		isHidden
+		lineageTag: 545469d8-3d12-4beb-b406-f44a4d397155
+		summarizeBy: none
+		sourceColumn: ID_Escala
+
+		annotation SummarizationSetBy = Automatic
+
+	column Data
+		dataType: dateTime
+		isHidden
+		formatString: dd/MM/yyyy
+		lineageTag: 6a26f938-99d4-4a97-8577-112b92afd1c6
+		summarizeBy: none
+		sourceColumn: Data
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column ID_Agente
+		dataType: string
+		isHidden
+		lineageTag: 5d9cd61e-0280-46f0-85ab-4513827793f8
+		summarizeBy: none
+		sourceColumn: ID_Agente
+
+		annotation SummarizationSetBy = Automatic
+
+	/// 360 sempre: escala 6x1 de 6h/dia.
+	column Minutos_Escalados
+		dataType: int64
+		formatString: 0
+		lineageTag: 4da43920-57f9-4ba3-b4d7-7c331fb92b13
+		summarizeBy: none
+		sourceColumn: Minutos_Escalados
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Sim em 916 dos 26.052 dias escalados — ABS de 3,52%, dentro da meta de 4%.
+	column Falta
+		dataType: string
+		lineageTag: 8bfe26de-f4e3-491a-bd0e-d2a0fc666ea4
+		summarizeBy: none
+		sourceColumn: Falta
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Atestado (487) ou Falta não justificada (429). Nulo quando o agente compareceu.
+	column Tipo_Ausencia
+		dataType: string
+		lineageTag: 0cff7e29-935a-443e-9d50-d24429547512
+		summarizeBy: none
+		sourceColumn: Tipo_Ausencia
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Numerador da aderência. Zero quando o agente faltou.
+	column Minutos_Aderentes
+		dataType: int64
+		formatString: 0
+		lineageTag: 696b773b-b853-48ff-a060-6bc5457ac403
+		summarizeBy: none
+		sourceColumn: Minutos_Aderentes
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Denominador da aderência: 360 se presente, 0 se faltou. O zero é intencional — a falta pesa no ABS sem ser contada de novo na aderência.
+	column Minutos_Base_Aderencia
+		dataType: int64
+		formatString: 0
+		lineageTag: d99ff28d-fddd-42bc-b78e-aec2f03e63cd
+		summarizeBy: none
+		sourceColumn: Minutos_Base_Aderencia
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Fato_Escala = m
+		mode: import
+		source =
+				let
+				    Origem = Csv.Document(
+				        File.Contents(Caminho_Base & "\Fato_Escala.csv"),
+				        [Delimiter = ";", Columns = 8, Encoding = 65001, QuoteStyle = QuoteStyle.Csv]
+				    ),
+				    Cabecalho = Table.PromoteHeaders(Origem, [PromoteAllScalars = true]),
+				    SemBOM = Table.TransformColumnNames(Cabecalho, each Text.Replace(_, "#(feff)", "")),
+				    //
+				    // Tipo_Ausencia vem vazio nos 25.136 dias em que o agente compareceu.
+				    Vazios = Table.ReplaceValue(SemBOM, "", null, Replacer.ReplaceValue, {"Tipo_Ausencia"}),
+				    //
+				    // Data em ISO — convertida sob en-US, onde yyyy-MM-dd é inequívoco
+				    TipoData = Table.TransformColumnTypes(Vazios, {{"Data", type date}}, "en-US"),
+				    //
+				    Tipos = Table.TransformColumnTypes(
+				        TipoData,
+				        {
+				            {"ID_Escala", type text},
+				            {"ID_Agente", type text},
+				            {"Minutos_Escalados", Int64.Type},
+				            {"Falta", type text},
+				            {"Tipo_Ausencia", type text},
+				            {"Minutos_Aderentes", Int64.Type},
+				            {"Minutos_Base_Aderencia", Int64.Type}
+				        },
+				        "pt-BR"
+				    )
+				in
+				    Tipos
+
+	annotation PBI_ResultType = Table
+

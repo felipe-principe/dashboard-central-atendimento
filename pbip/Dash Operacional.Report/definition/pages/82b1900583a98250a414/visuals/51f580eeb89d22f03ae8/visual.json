@@ -1,0 +1,65 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.10.0/schema.json",
+  "name": "51f580eeb89d22f03ae8",
+  "position": {
+    "x": 104.23940149625935,
+    "y": 693.96508728179549,
+    "z": 12000,
+    "height": 25.137157107231918,
+    "width": 1231.7206982543642,
+    "tabOrder": 12000
+  },
+  "visual": {
+    "visualType": "textbox",
+    "objects": {
+      "general": [
+        {
+          "properties": {
+            "paragraphs": [
+              {
+                "textRuns": [
+                  {
+                    "value": "Junho/25 concentra um incidente: 15.856 chamados contra média de ~11.800. No mesmo mês o ABS estourou a meta (5,81%) e o SLA caiu para 76,9%, a página de Nível de Serviço abre a causa hora a hora.",
+                    "textStyle": {
+                      "fontSize": "9pt",
+                      "color": "#8b94a8"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "visualContainerObjects": {
+      "background": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "border": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

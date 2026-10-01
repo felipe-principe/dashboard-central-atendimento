@@ -1,0 +1,150 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/report/3.3.0/schema.json",
+  "themeCollection": {
+    "baseTheme": {
+      "name": "Fluent2-CY26SU08",
+      "reportVersionAtImport": {
+        "visual": "2.12.0",
+        "report": "3.4.0",
+        "page": "2.3.1"
+      },
+      "type": "SharedResources"
+    },
+    "customTheme": {
+      "name": "Operacional-escuro.json",
+      "reportVersionAtImport": {
+        "visual": "2.12.0",
+        "report": "3.4.0",
+        "page": "2.3.1"
+      },
+      "type": "RegisteredResources"
+    }
+  },
+  "objects": {
+    "section": [
+      {
+        "properties": {
+          "verticalAlignment": {
+            "expr": {
+              "Literal": {
+                "Value": "'Top'"
+              }
+            }
+          }
+        }
+      }
+    ],
+    "outspacePane": [
+      {
+        "properties": {
+          "expanded": {
+            "expr": {
+              "Literal": {
+                "Value": "false"
+              }
+            }
+          }
+        }
+      }
+    ]
+  },
+  "resourcePackages": [
+    {
+      "name": "SharedResources",
+      "type": "SharedResources",
+      "items": [
+        {
+          "name": "Fluent2-CY26SU08",
+          "path": "BaseThemes/Fluent2-CY26SU08.json",
+          "type": "BaseTheme"
+        }
+      ]
+    },
+    {
+      "name": "RegisteredResources",
+      "type": "RegisteredResources",
+      "items": [
+        {
+          "name": "barra-equipes.png",
+          "path": "barra-equipes.png",
+          "type": "Image"
+        },
+        {
+          "name": "barra-qualidade.png",
+          "path": "barra-qualidade.png",
+          "type": "Image"
+        },
+        {
+          "name": "barra-visao.png",
+          "path": "barra-visao.png",
+          "type": "Image"
+        },
+        {
+          "name": "barra-wfm.png",
+          "path": "barra-wfm.png",
+          "type": "Image"
+        },
+        {
+          "name": "fundo-1480.gif",
+          "path": "fundo-1480.gif",
+          "type": "Image"
+        },
+        {
+          "name": "fundo-1680.gif",
+          "path": "fundo-1680.gif",
+          "type": "Image"
+        },
+        {
+          "name": "fundo-720.gif",
+          "path": "fundo-720.gif",
+          "type": "Image"
+        },
+        {
+          "name": "fundo-capa.gif",
+          "path": "fundo-capa.gif",
+          "type": "Image"
+        },
+        {
+          "name": "ic-equipes.png",
+          "path": "ic-equipes.png",
+          "type": "Image"
+        },
+        {
+          "name": "ic-qualidade.png",
+          "path": "ic-qualidade.png",
+          "type": "Image"
+        },
+        {
+          "name": "ic-visao.png",
+          "path": "ic-visao.png",
+          "type": "Image"
+        },
+        {
+          "name": "ic-wfm.png",
+          "path": "ic-wfm.png",
+          "type": "Image"
+        },
+        {
+          "name": "logo-lockup.png",
+          "path": "logo-lockup.png",
+          "type": "Image"
+        },
+        {
+          "name": "Operacional-escuro.json",
+          "path": "Operacional-escuro.json",
+          "type": "CustomTheme"
+        }
+      ]
+    }
+  ],
+  "settings": {
+    "useStylableVisualContainerHeader": true,
+    "exportDataMode": "AllowSummarized",
+    "defaultDrillFilterOtherVisuals": true,
+    "allowChangeFilterTypes": true,
+    "useEnhancedTooltips": true,
+    "useDefaultAggregateDisplayName": true,
+    "customMemoryLimit": "1048576",
+    "customTimeoutLimit": "225"
+  }
+}

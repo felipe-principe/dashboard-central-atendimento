@@ -1,0 +1,7 @@
+{
+  "name": "central-atendimento-sql",
+  "private": true,
+  "type": "module",
+  "scripts": { "consultas": "node rodar.mjs" },
+  "dependencies": { "@duckdb/node-api": "^1.5.6-r.1" }
+}

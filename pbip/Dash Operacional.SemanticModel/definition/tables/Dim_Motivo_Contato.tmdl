@@ -1,0 +1,75 @@
+/// 51 motivos de contato em 8 categorias, herdadas da taxonomia real de referência (por isso em inglês). Relaciona-se apenas com Fato_Chamados: o abandono acontece antes de alguém descobrir o motivo.
+table Dim_Motivo_Contato
+	lineageTag: 64d6d101-424f-46ae-bb6e-00ab806765b4
+
+	/// Chave. Relaciona-se somente com Fato_Chamados.
+	column ID_Motivo
+		dataType: string
+		isHidden
+		lineageTag: e8e2e1e0-343a-441c-9c62-af9747287cbc
+		summarizeBy: none
+		sourceColumn: ID_Motivo
+
+		annotation SummarizationSetBy = Automatic
+
+	column Categoria
+		dataType: string
+		lineageTag: 2f6ed06f-fdd4-43fa-8e53-d51c0ba9dd36
+		summarizeBy: none
+		sourceColumn: Categoria
+
+		annotation SummarizationSetBy = Automatic
+
+	column Subcategoria
+		dataType: string
+		lineageTag: 4af59a74-617d-439b-a356-d6c576410de4
+		summarizeBy: none
+		sourceColumn: Subcategoria
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Formato "Cancel > Refund". Útil onde a subcategoria sozinha seria ambígua.
+	column Categoria_Subcategoria
+		dataType: string
+		lineageTag: 38cd7a01-41f8-4ecc-b247-3ace377c78f9
+		summarizeBy: none
+		sourceColumn: Categoria_Subcategoria
+
+		annotation SummarizationSetBy = Automatic
+
+	hierarchy Motivo
+		lineageTag: b2982ce1-2731-4791-bb1d-4f8a399c704e
+
+		level Categoria
+			lineageTag: ef4ffd80-525e-4d9c-b7ad-4f719aeded84
+			column: Categoria
+
+		level Subcategoria
+			lineageTag: bb654b15-23bc-4fc3-9b6f-b31025356978
+			column: Subcategoria
+
+	partition Dim_Motivo_Contato = m
+		mode: import
+		source =
+				let
+				    Origem = Csv.Document(
+				        File.Contents(Caminho_Base & "\Dim_Motivo_Contato.csv"),
+				        [Delimiter = ";", Columns = 4, Encoding = 65001, QuoteStyle = QuoteStyle.Csv]
+				    ),
+				    Cabecalho = Table.PromoteHeaders(Origem, [PromoteAllScalars = true]),
+				    SemBOM = Table.TransformColumnNames(Cabecalho, each Text.Replace(_, "#(feff)", "")),
+				    Tipos = Table.TransformColumnTypes(
+				        SemBOM,
+				        {
+				            {"ID_Motivo", type text},
+				            {"Categoria", type text},
+				            {"Subcategoria", type text},
+				            {"Categoria_Subcategoria", type text}
+				        },
+				        "pt-BR"
+				    )
+				in
+				    Tipos
+
+	annotation PBI_ResultType = Table
+

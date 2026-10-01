@@ -1,0 +1,65 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.10.0/schema.json",
+  "name": "451e5409f318d5d27f44",
+  "position": {
+    "x": 103.61015785861359,
+    "y": 1441.2079615648593,
+    "z": 13000,
+    "height": 39.203843514070009,
+    "width": 1232.120796156486,
+    "tabOrder": 13000
+  },
+  "visual": {
+    "visualType": "textbox",
+    "objects": {
+      "general": [
+        {
+          "properties": {
+            "paragraphs": [
+              {
+                "textRuns": [
+                  {
+                    "value": "Quanto maior o TMA, menor a satisfação, a mesma relação nos 90 agentes. As equipes de Leonel Quadros e Gilberto Rezende têm os piores TMA, SLA e ABS, e são as duas que estouram a meta de 4%; a de Mirela Sampaio lidera nos três.",
+                    "textStyle": {
+                      "fontSize": "9pt",
+                      "color": "#8b94a8"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "visualContainerObjects": {
+      "background": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "border": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

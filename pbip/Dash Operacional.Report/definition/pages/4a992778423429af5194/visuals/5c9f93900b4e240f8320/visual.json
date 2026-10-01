@@ -1,0 +1,65 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
+  "name": "5c9f93900b4e240f8320",
+  "position": {
+    "x": 104,
+    "y": 1620,
+    "z": 19000,
+    "height": 40,
+    "width": 1232,
+    "tabOrder": 19000
+  },
+  "visual": {
+    "visualType": "textbox",
+    "objects": {
+      "general": [
+        {
+          "properties": {
+            "paragraphs": [
+              {
+                "textRuns": [
+                  {
+                    "value": "O Nível de Serviço fica abaixo da meta de 80%, e a causa é disponibilidade: quem desiste espera ~114 s contra ~27 s de quem é atendido. Em junho, com ABS em 5,81% e aderência em 84,3%, faltou gente em linha e o serviço desabou para 61,6%.",
+                    "textStyle": {
+                      "fontSize": "9pt",
+                      "color": "#8B94A8"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "visualContainerObjects": {
+      "background": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "border": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

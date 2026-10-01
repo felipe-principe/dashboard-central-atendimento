@@ -1,0 +1,232 @@
+/// Calendário do projeto: 365 dias contínuos de 01/01/2025 a 31/12/2025, com feriados. Marcada como tabela de data do modelo — é ela que sustenta a inteligência de tempo (DATEADD, SAMEPERIODLASTYEAR).
+table Dim_Data
+	lineageTag: d61a2e89-eb93-44fb-be09-907fefaf4c50
+	dataCategory: Time
+
+	/// Chave do calendário. Relaciona-se com as três tabelas fato.
+	column Data
+		dataType: dateTime
+		isKey
+		formatString: dd/MM/yyyy
+		lineageTag: 81748c6e-fd11-4a9f-98ef-1939a4995b93
+		summarizeBy: none
+		sourceColumn: Data
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column Ano
+		dataType: int64
+		formatString: 0
+		lineageTag: e2dfbf24-a09d-43f9-b1b4-83eae4448937
+		summarizeBy: none
+		sourceColumn: Ano
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Número do mês. Serve para ordenar Nome_Mes; fica oculta.
+	column Mes
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: bee0aa48-c3ff-4b7a-bc66-200580fa7fb7
+		summarizeBy: none
+		sourceColumn: Mes
+
+		annotation SummarizationSetBy = Automatic
+
+	column Nome_Mes
+		dataType: string
+		lineageTag: f45cd34f-f042-4d32-80fc-9a1a03bfcb5a
+		summarizeBy: none
+		sourceColumn: Nome_Mes
+		sortByColumn: Mes
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Formato 2025-10. Ordena corretamente como texto, sem precisar de coluna de apoio.
+	column Ano_Mes
+		dataType: string
+		lineageTag: 64a1fb6f-447d-4ebc-9e57-cfa5f5274e44
+		summarizeBy: none
+		sourceColumn: Ano_Mes
+
+		annotation SummarizationSetBy = Automatic
+
+	column Trimestre
+		dataType: string
+		lineageTag: 30f66bf4-930a-47bd-90a3-4fb2bbb596c5
+		summarizeBy: none
+		sourceColumn: Trimestre
+
+		annotation SummarizationSetBy = Automatic
+
+	column Ano_Trimestre
+		dataType: string
+		lineageTag: ac505824-67d9-4843-b28d-5e830267495c
+		summarizeBy: none
+		sourceColumn: Ano_Trimestre
+
+		annotation SummarizationSetBy = Automatic
+
+	column Dia
+		dataType: int64
+		formatString: 0
+		lineageTag: 85ce6377-1615-459e-82d1-ce82b2e6cf13
+		summarizeBy: none
+		sourceColumn: Dia
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Serve para ordenar Nome_Dia_Semana; fica oculta.
+	column Num_Dia_Semana
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 2053f5e1-df5e-4290-85a8-e05636384bed
+		summarizeBy: none
+		sourceColumn: Num_Dia_Semana
+
+		annotation SummarizationSetBy = Automatic
+
+	column Nome_Dia_Semana
+		dataType: string
+		lineageTag: 114fa7b6-a0cf-4f09-9a51-4b0ea1916755
+		summarizeBy: none
+		sourceColumn: Nome_Dia_Semana
+		sortByColumn: Num_Dia_Semana
+
+		annotation SummarizationSetBy = Automatic
+
+	column Fim_de_Semana
+		dataType: string
+		lineageTag: 5e0b402c-c2fe-4f21-9310-39d445fc35dc
+		summarizeBy: none
+		sourceColumn: Fim_de_Semana
+
+		annotation SummarizationSetBy = Automatic
+
+	column Semana_Ano
+		dataType: int64
+		formatString: 0
+		lineageTag: ba3ef755-1b1a-42c7-9279-cf02574cac59
+		summarizeBy: none
+		sourceColumn: Semana_Ano
+
+		annotation SummarizationSetBy = Automatic
+
+	/// 13 dias marcados como feriado no período.
+	column Feriado
+		dataType: string
+		lineageTag: 7c572b26-13bd-4b4e-a40c-34d7b8e2c254
+		summarizeBy: none
+		sourceColumn: Feriado
+
+		annotation SummarizationSetBy = Automatic
+
+	column Nome_Feriado
+		dataType: string
+		lineageTag: 194a7334-497e-454c-9722-d24372507b11
+		summarizeBy: none
+		sourceColumn: Nome_Feriado
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Abreviação de três letras do dia da semana (Seg, Ter, Qua...). Existe para
+	/// os heatmaps hora x dia da semana, onde o nome inteiro não cabe na coluna.
+	/// Ordena pelo número do dia, não em ordem alfabética.
+	column Dia_Semana_Curto = LEFT(Dim_Data[Nome_Dia_Semana], 3)
+		dataType: string
+		lineageTag: 6f2a1c84-3b5e-4d90-a7c1-95e8d2f40b17
+		summarizeBy: none
+		sortByColumn: Num_Dia_Semana
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Abreviação de três letras do mês (Jan, Fev, Mar...). Existe para a faixa
+	/// de meses do filtro, onde o nome inteiro não cabe no botão.
+	/// Ordena pelo número do mês, não em ordem alfabética.
+	column Mes_Curto = LEFT(Dim_Data[Nome_Mes], 3)
+		dataType: string
+		lineageTag: 4c91e7a2-88b0-4d1f-9e63-2a7f501cc8d4
+		summarizeBy: none
+		sortByColumn: Mes
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Mês e ano no formato "Out/25", para o eixo dos gráficos de tendência.
+	/// Ordena por Ano_Mes ("2025-10"), que já ordena certo como texto e é 1 para 1
+	/// com esta coluna — por isso não precisa de coluna numérica de apoio.
+	column Mes_Ano = LEFT(Dim_Data[Nome_Mes], 3) & "/" & MID(Dim_Data[Ano_Mes], 3, 2)
+		dataType: string
+		lineageTag: 5d02f8b3-99c1-4e2a-8f74-3b6a9c1e0d55
+		summarizeBy: none
+		sortByColumn: Ano_Mes
+
+		annotation SummarizationSetBy = Automatic
+
+	hierarchy Calendário
+		lineageTag: aaa0389b-51b7-43f5-aa8d-c1b069fddd32
+
+		level Ano
+			lineageTag: c9611231-481a-4419-ada9-465cde7ad264
+			column: Ano
+
+		level Trimestre
+			lineageTag: f58e192c-ca8f-4445-89e6-de49be1079f2
+			column: Trimestre
+
+		level Nome_Mes
+			lineageTag: e2672a57-9169-43e7-ab4b-0c5d1087538d
+			column: Nome_Mes
+
+		level Dia
+			lineageTag: df3a65b9-0a32-4f49-88af-75cd81d6592f
+			column: Dia
+
+	partition Dim_Data = m
+		mode: import
+		source =
+				let
+				    Origem = Csv.Document(
+				        File.Contents(Caminho_Base & "\Dim_Data.csv"),
+				        [Delimiter = ";", Columns = 14, Encoding = 65001, QuoteStyle = QuoteStyle.Csv]
+				    ),
+				    Cabecalho = Table.PromoteHeaders(Origem, [PromoteAllScalars = true]),
+				    SemBOM = Table.TransformColumnNames(Cabecalho, each Text.Replace(_, "#(feff)", "")),
+				    //
+				    // Nome_Feriado vem vazio em 352 dos 365 dias. Texto vazio e valor ausente
+				    // não são a mesma coisa: "" vira item fantasma na segmentação e não
+				    // responde a ISBLANK. Normalizar para null resolve os dois.
+				    Vazios = Table.ReplaceValue(SemBOM, "", null, Replacer.ReplaceValue, {"Nome_Feriado"}),
+				    //
+				    // Datas em ISO — convertidas sob en-US, onde yyyy-MM-dd é inequívoco.
+				    // Os decimais do projeto usam vírgula (pt-BR), então cada grupo de colunas
+				    // é convertido sob a cultura em que seu formato não tem ambiguidade.
+				    TiposData = Table.TransformColumnTypes(Vazios, {{"Data", type date}}, "en-US"),
+				    //
+				    Tipos = Table.TransformColumnTypes(
+				        TiposData,
+				        {
+				            {"Ano", Int64.Type},
+				            {"Mes", Int64.Type},
+				            {"Nome_Mes", type text},
+				            {"Ano_Mes", type text},
+				            {"Trimestre", type text},
+				            {"Ano_Trimestre", type text},
+				            {"Dia", Int64.Type},
+				            {"Num_Dia_Semana", Int64.Type},
+				            {"Nome_Dia_Semana", type text},
+				            {"Fim_de_Semana", type text},
+				            {"Semana_Ano", Int64.Type},
+				            {"Feriado", type text},
+				            {"Nome_Feriado", type text}
+				        },
+				        "pt-BR"
+				    )
+				in
+				    Tipos
+
+	annotation PBI_ResultType = Table
+

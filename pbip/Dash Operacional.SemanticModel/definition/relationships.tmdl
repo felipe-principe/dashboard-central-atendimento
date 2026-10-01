@@ -1,0 +1,44 @@
+relationship 56e7078c-79c2-4a43-a114-6bd9fe9b51e9
+	fromColumn: Fato_Chamados.Data
+	toColumn: Dim_Data.Data
+
+relationship eeeb3edc-265a-4ac3-841f-bdd2ee4c52d3
+	fromColumn: Fato_Chamados.ID_Cliente
+	toColumn: Dim_Cliente.ID_Cliente
+
+relationship cf919775-c7f5-41eb-bf69-9d3ec011aad5
+	fromColumn: Fato_Chamados.ID_Agente
+	toColumn: Dim_Agente.ID_Agente
+
+relationship a717a0e4-52d1-4763-9a5f-9cf69c441ddf
+	fromColumn: Fato_Chamados.ID_Canal
+	toColumn: Dim_Canal.ID_Canal
+
+relationship 17be78b4-5651-471c-a3cd-13f0ccd422c0
+	fromColumn: Fato_Chamados.ID_Motivo
+	toColumn: Dim_Motivo_Contato.ID_Motivo
+
+relationship ec2a8228-6c83-4e09-b959-12a45f09e5ee
+	fromColumn: Fato_Chamados.Hora
+	toColumn: Dim_Hora.Hora
+
+relationship d03b2c77-439e-44f8-8a49-8de5c1a3a13e
+	fromColumn: Fato_Abandonos.Data
+	toColumn: Dim_Data.Data
+
+relationship df77ae67-aaff-4dbe-9cc1-82711e047b35
+	fromColumn: Fato_Abandonos.ID_Canal
+	toColumn: Dim_Canal.ID_Canal
+
+relationship 93bdcd50-8187-4604-81f2-c34c2c3b82e1
+	fromColumn: Fato_Abandonos.Hora
+	toColumn: Dim_Hora.Hora
+
+relationship ceaa1d60-a49a-4bf7-bd65-686afaaf618c
+	fromColumn: Fato_Escala.Data
+	toColumn: Dim_Data.Data
+
+relationship da36668c-4189-4995-a89c-c5f949c993a1
+	fromColumn: Fato_Escala.ID_Agente
+	toColumn: Dim_Agente.ID_Agente
+

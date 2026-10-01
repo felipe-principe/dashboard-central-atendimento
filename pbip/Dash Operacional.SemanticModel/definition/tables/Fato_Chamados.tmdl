@@ -1,0 +1,234 @@
+/// Grão: 1 linha por chamado atendido. 141.431 linhas no período de 12 meses. Tabela central do modelo.
+table Fato_Chamados
+	lineageTag: 73cc821e-b4fc-406f-86d6-550af1734ec8
+
+	/// Visível de propósito: a página de Backlog precisa identificar os casos mais antigos.
+	column ID_Chamado
+		dataType: string
+		lineageTag: 8fd079b8-2d3e-458a-be1e-f9adb576f76d
+		summarizeBy: none
+		sourceColumn: ID_Chamado
+
+		annotation SummarizationSetBy = Automatic
+
+	column Data_Abertura
+		dataType: dateTime
+		formatString: dd/MM/yyyy HH:mm
+		lineageTag: bc5907aa-ae54-43eb-91f2-8105aa3c67a4
+		summarizeBy: none
+		sourceColumn: Data_Abertura
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Atributo descritivo apenas. Não use em relação: 4 chamados fecham em 01/01/2026, um dia além do fim do calendário.
+	column Data_Fechamento
+		dataType: dateTime
+		formatString: dd/MM/yyyy HH:mm
+		lineageTag: 625b6c92-b1b6-4270-90b2-2a7f0db7f929
+		summarizeBy: none
+		sourceColumn: Data_Fechamento
+
+		annotation SummarizationSetBy = Automatic
+
+	column ID_Cliente
+		dataType: string
+		isHidden
+		lineageTag: 32b8f9ac-637d-4d92-851c-c81823bb2e52
+		summarizeBy: none
+		sourceColumn: ID_Cliente
+
+		annotation SummarizationSetBy = Automatic
+
+	column ID_Agente
+		dataType: string
+		isHidden
+		lineageTag: 3c55e6ae-06f0-45cf-afe1-2e5f95a0710b
+		summarizeBy: none
+		sourceColumn: ID_Agente
+
+		annotation SummarizationSetBy = Automatic
+
+	column ID_Canal
+		dataType: string
+		isHidden
+		lineageTag: 6cc8b03e-712a-4d86-88da-3a07da66d72d
+		summarizeBy: none
+		sourceColumn: ID_Canal
+
+		annotation SummarizationSetBy = Automatic
+
+	column ID_Motivo
+		dataType: string
+		isHidden
+		lineageTag: 0689c08d-4d1f-4037-b922-c3162f88c678
+		summarizeBy: none
+		sourceColumn: ID_Motivo
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Duração da interação em minutos. Média geral da base: 14,67 min.
+	column Duracao_Min
+		dataType: double
+		formatString: 0.0
+		lineageTag: 4db39a82-bc05-49ac-9028-9e5036a96aba
+		summarizeBy: none
+		sourceColumn: Duracao_Min
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Sim em 116.278 chamados (82,2%).
+	column SLA_Cumprido
+		dataType: string
+		lineageTag: edb830e8-fddb-43e4-adde-7cbad5da6ce3
+		summarizeBy: none
+		sourceColumn: SLA_Cumprido
+
+		annotation SummarizationSetBy = Automatic
+
+	column Tempo_Espera_Seg
+		dataType: double
+		formatString: 0
+		lineageTag: 1e7bc672-aba5-4def-adcc-bb360012b418
+		summarizeBy: none
+		sourceColumn: Tempo_Espera_Seg
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Sim em 109.462 chamados (77,4%). Espera dentro da meta do canal.
+	column Nivel_Servico_Cumprido
+		dataType: string
+		lineageTag: 1e00d041-fd42-42b0-8e04-6a4eda9af2a6
+		summarizeBy: none
+		sourceColumn: Nivel_Servico_Cumprido
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Sim em 43.018 chamados. É o denominador do C-SAT e do IR.
+	column Pesquisa_Respondida
+		dataType: string
+		lineageTag: a51e293b-3303-4d85-b922-d757e4850c2d
+		summarizeBy: none
+		sourceColumn: Pesquisa_Respondida
+
+		annotation SummarizationSetBy = Automatic
+
+	/// De 1 a 5. Nulo nos 98.413 chamados sem pesquisa respondida.
+	column Nota_Experiencia
+		dataType: int64
+		formatString: 0
+		lineageTag: 50887f1e-aa0e-4729-b797-55c5e3ab34c3
+		summarizeBy: none
+		sourceColumn: Nota_Experiencia
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Nulo nos 98.413 chamados sem pesquisa respondida.
+	column Problema_Resolvido
+		dataType: string
+		lineageTag: 1eb2b94e-de55-4ee8-b008-78820a27615a
+		summarizeBy: none
+		sourceColumn: Problema_Resolvido
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Sim em 10.639 chamados (7,5%).
+	column Reaberto
+		dataType: string
+		lineageTag: 1f296581-1eeb-4f4e-8d7f-3170e74dd84c
+		summarizeBy: none
+		sourceColumn: Reaberto
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Encerrado (140.121), Aguardando Retorno (705) ou Escalonado (605). Os 1.310 não encerrados são os casos pendentes da página de Backlog.
+	column Status_Caso
+		dataType: string
+		lineageTag: 9860e57c-270a-41d9-8f78-1ed4184994fd
+		summarizeBy: none
+		sourceColumn: Status_Caso
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Chave de data, derivada de Data_Abertura.
+	column Data
+		dataType: dateTime
+		isHidden
+		formatString: dd/MM/yyyy
+		lineageTag: 5dab5e76-3f94-48ee-aa55-b579f8ba6093
+		summarizeBy: none
+		sourceColumn: Data
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	/// Chave de hora (0 a 23), derivada de Data_Abertura.
+	column Hora
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 66b945a2-f206-4657-9a38-41a2269281ef
+		summarizeBy: none
+		sourceColumn: Hora
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Fato_Chamados = m
+		mode: import
+		source =
+				let
+				    Origem = Csv.Document(
+				        File.Contents(Caminho_Base & "\Fato_Chamados.csv"),
+				        [Delimiter = ";", Columns = 16, Encoding = 65001, QuoteStyle = QuoteStyle.Csv]
+				    ),
+				    Cabecalho = Table.PromoteHeaders(Origem, [PromoteAllScalars = true]),
+				    SemBOM = Table.TransformColumnNames(Cabecalho, each Text.Replace(_, "#(feff)", "")),
+				    //
+				    // Nota_Experiencia e Problema_Resolvido vêm vazios nos 98.413 chamados sem
+				    // pesquisa respondida. Normalizar "" para null evita o item fantasma na
+				    // segmentação e faz as colunas responderem a ISBLANK.
+				    Vazios = Table.ReplaceValue(
+				        SemBOM, "", null, Replacer.ReplaceValue,
+				        {"Nota_Experiencia", "Problema_Resolvido"}
+				    ),
+				    //
+				    // Datas em ISO sob en-US; decimais com vírgula sob pt-BR.
+				    TiposData = Table.TransformColumnTypes(
+				        Vazios,
+				        {
+				            {"Data_Abertura", type datetime},
+				            {"Data_Fechamento", type datetime}
+				        },
+				        "en-US"
+				    ),
+				    //
+				    Tipos = Table.TransformColumnTypes(
+				        TiposData,
+				        {
+				            {"ID_Chamado", type text},
+				            {"ID_Cliente", type text},
+				            {"ID_Agente", type text},
+				            {"ID_Canal", type text},
+				            {"ID_Motivo", type text},
+				            {"Duracao_Min", type number},
+				            {"SLA_Cumprido", type text},
+				            {"Tempo_Espera_Seg", type number},
+				            {"Nivel_Servico_Cumprido", type text},
+				            {"Pesquisa_Respondida", type text},
+				            {"Nota_Experiencia", Int64.Type},
+				            {"Problema_Resolvido", type text},
+				            {"Reaberto", type text},
+				            {"Status_Caso", type text}
+				        },
+				        "pt-BR"
+				    ),
+				    //
+				    // Data_Abertura é Data/Hora e não casa com uma dimensão de Data: a relação
+				    // só encontraria as linhas de 00:00:00. Daí a coluna Data separada.
+				    ChaveData = Table.AddColumn(Tipos, "Data", each Date.From([Data_Abertura]), type date),
+				    ChaveHora = Table.AddColumn(ChaveData, "Hora", each Time.Hour([Data_Abertura]), Int64.Type)
+				in
+				    ChaveHora
+
+	annotation PBI_ResultType = Table
+

@@ -1,0 +1,99 @@
+/// 45.000 assinantes. Só 35.754 abriram algum chamado — por isso "clientes atendidos" é DISTINCTCOUNT sobre o fato, nunca COUNTROWS desta tabela. Relaciona-se apenas com Fato_Chamados.
+table Dim_Cliente
+	lineageTag: 5ac525e2-20c9-40a1-8af8-f453b718d2c3
+
+	/// Chave. Relaciona-se somente com Fato_Chamados.
+	column ID_Cliente
+		dataType: string
+		isHidden
+		lineageTag: 7718af54-85a0-42e7-87cc-e516cce38968
+		summarizeBy: none
+		sourceColumn: ID_Cliente
+
+		annotation SummarizationSetBy = Automatic
+
+	column Plano
+		dataType: string
+		lineageTag: b2f22508-0784-461d-86bf-be113e7ed140
+		summarizeBy: none
+		sourceColumn: Plano
+		sortByColumn: Ordem_Plano
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Ordena o plano por valor do produto: Básico > Padrão > Premium.
+	column Ordem_Plano
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: e4554533-95fa-4047-bf73-9fc9a26e8788
+		summarizeBy: none
+		sourceColumn: Ordem_Plano
+
+		annotation SummarizationSetBy = Automatic
+
+	column Regiao
+		dataType: string
+		lineageTag: fdb62adb-bb6b-4c30-826d-fe0fec459e2c
+		summarizeBy: none
+		sourceColumn: Regiao
+
+		annotation SummarizationSetBy = Automatic
+
+	column Pais
+		dataType: string
+		lineageTag: fbfb3087-c088-41b9-a7a4-9d906e841d0b
+		dataCategory: Country
+		summarizeBy: none
+		sourceColumn: Pais
+
+		annotation SummarizationSetBy = Automatic
+
+	column Data_Assinatura
+		dataType: dateTime
+		formatString: dd/MM/yyyy
+		lineageTag: dceb6fd1-e5b8-43d0-91d9-20f1d9efc930
+		summarizeBy: none
+		sourceColumn: Data_Assinatura
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	partition Dim_Cliente = m
+		mode: import
+		source =
+				let
+				    Origem = Csv.Document(
+				        File.Contents(Caminho_Base & "\Dim_Cliente.csv"),
+				        [Delimiter = ";", Columns = 5, Encoding = 65001, QuoteStyle = QuoteStyle.Csv]
+				    ),
+				    Cabecalho = Table.PromoteHeaders(Origem, [PromoteAllScalars = true]),
+				    SemBOM = Table.TransformColumnNames(Cabecalho, each Text.Replace(_, "#(feff)", "")),
+				    //
+				    // Data em ISO — convertida sob en-US, onde yyyy-MM-dd é inequívoco
+				    TipoData = Table.TransformColumnTypes(SemBOM, {{"Data_Assinatura", type date}}, "en-US"),
+				    //
+				    Tipos = Table.TransformColumnTypes(
+				        TipoData,
+				        {
+				            {"ID_Cliente", type text},
+				            {"Plano", type text},
+				            {"Regiao", type text},
+				            {"Pais", type text}
+				        },
+				        "pt-BR"
+				    ),
+				    OrdemPlano = Table.AddColumn(
+				        Tipos,
+				        "Ordem_Plano",
+				        each if Text.StartsWith([Plano], "Basico") then 1
+				             else if [Plano] = "Padrao" then 2
+				             else 3,
+				        Int64.Type
+				    )
+				in
+				    OrdemPlano
+
+	annotation PBI_ResultType = Table
+

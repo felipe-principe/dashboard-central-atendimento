@@ -1,0 +1,9 @@
+/// Pasta onde estão os 8 CSVs da base. Trocar aqui move o projeto inteiro de
+/// máquina sem editar nenhuma das 10 consultas.
+expression Caminho_Base = "C:\Projetos\dashboard-central-atendimento\dados" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: 73d86041-960a-4f97-acf2-38564792fb30
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Text
+

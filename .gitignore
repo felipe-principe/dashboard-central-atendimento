@@ -1,0 +1,6 @@
+# Power BI: arquivos locais e cache
+**/.pbi/localSettings.json
+**/.pbi/cache.abf
+
+# dependências do script SQL
+node_modules/

@@ -1,0 +1,152 @@
+{
+  "version": "1.1.0",
+  "diagrams": [
+    {
+      "ordinal": 0,
+      "scrollPosition": {
+        "x": 0,
+        "y": 0
+      },
+      "nodes": [
+        {
+          "location": {
+            "x": 1129.8100944498019,
+            "y": 523.24516213761638
+          },
+          "nodeIndex": "_Medidas",
+          "nodeLineageTag": "a6205f02-4953-4446-9a47-199a37e3927d",
+          "size": {
+            "height": 104,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 560.26941728858435,
+            "y": -50
+          },
+          "nodeIndex": "Dim_Agente",
+          "nodeLineageTag": "ca0bb1fe-a7d1-43d3-ab84-c9defae60508",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 576.56220496228457,
+            "y": 650.39406046455872
+          },
+          "nodeIndex": "Dim_Canal",
+          "nodeLineageTag": "ed89d5f1-d898-4e1b-9b07-323b900eb88a",
+          "size": {
+            "height": 224,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 52.795281524019856,
+            "y": 93.242807067996864
+          },
+          "nodeIndex": "Dim_Cliente",
+          "nodeLineageTag": "5ac525e2-20c9-40a1-8af8-f453b718d2c3",
+          "size": {
+            "height": 224,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 752.72646823461866,
+            "y": 300.2244583716739
+          },
+          "nodeIndex": "Dim_Data",
+          "nodeLineageTag": "d61a2e89-eb93-44fb-be09-907fefaf4c50",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 334.31044122987083,
+            "y": 924.49032427523264
+          },
+          "nodeIndex": "Dim_Hora",
+          "nodeLineageTag": "371d4766-b484-43be-a86c-b25fb692b5f6",
+          "size": {
+            "height": 176,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 50,
+            "y": 716.44495598751928
+          },
+          "nodeIndex": "Dim_Motivo_Contato",
+          "nodeLineageTag": "64d6d101-424f-46ae-bb6e-00ab806765b4",
+          "size": {
+            "height": 248,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 860.69737897317873,
+            "y": 818.47621407900465
+          },
+          "nodeIndex": "Fato_Abandonos",
+          "nodeLineageTag": "7c4dd24c-e0fe-4b50-9677-e0092a82d288",
+          "size": {
+            "height": 224,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 336.99691700111157,
+            "y": 300.21649794349332
+          },
+          "nodeIndex": "Fato_Chamados",
+          "nodeLineageTag": "73cc821e-b4fc-406f-86d6-550af1734ec8",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 895.8100944498018,
+            "y": -21.994818783901792
+          },
+          "nodeIndex": "Fato_Escala",
+          "nodeLineageTag": "ea280764-5ed6-49a1-96cf-4670bf586c31",
+          "size": {
+            "height": 272,
+            "width": 234
+          },
+          "zIndex": 0
+        }
+      ],
+      "name": "Todas as tabelas",
+      "zoomValue": 100,
+      "pinKeyFieldsToTop": false,
+      "showExtraHeaderInfo": false,
+      "hideKeyFieldsWhenCollapsed": false,
+      "tablesLocked": false
+    }
+  ],
+  "selectedDiagram": "Todas as tabelas",
+  "defaultDiagram": "Todas as tabelas"
+}
